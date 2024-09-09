@@ -42,7 +42,7 @@ async def convert(ctx, message_link: str, generate_mp4: bool = False):
         if not video_url:
             return
 
-        await ctx.send(f"Creating asset on Mux{'with MP4 support ' if generate_mp4 else ''}...")
+        await ctx.send(f"Creating asset on Mux{' with MP4 support' if generate_mp4 else ''}...")
         asset = await create_mux_asset(video_url, generate_mp4)
 
         playback_id = asset.data.playback_ids[0].id
