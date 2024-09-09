@@ -51,11 +51,8 @@ async def convert(ctx, message_link: str, generate_mp4: bool = False):
         if not video_url:
             return
 
-        await ctx.send("Creating asset on Mux, please wait...")
-        asset = await create_mux_asset(video_url)
-        if not asset:
-            await ctx.send("Failed to create asset on Mux.")
-            return
+        await ctx.send(f"Creating asset on Mux{' with MP4 support' if generate_mp4 else ''}...")
+        asset = await create_mux_asset(video_url, generate_mp4)
 
         playback_id = asset.data.playback_ids[0].id
         streaming_url = f"https://stream.mux.com/{playback_id}.m3u8"
@@ -114,15 +111,15 @@ async def get_video_url(ctx, message_link):
     logger.info(f"Found video URL: {video_url}")
     return video_url
 
-async def create_mux_asset(video_url):
-    mp4_quality = "capped-1080p"
+async def create_mux_asset(video_url, generate_mp4=False):
     input_settings = mux_python.InputSettings(url=video_url)
     create_asset_request = mux_python.CreateAssetRequest(
         input=input_settings,
-        mp4_support=mp4_quality,
-        playback_policy=['public']
+        playback_policy=['public'],
+        mp4_support="capped-1080p" if generate_mp4 else None,
         video_quality=video_quality
     )
+    
     asset = assets_api.create_asset(create_asset_request)
     logger.info(f"Asset created with ID: {asset.data.id}")
     
