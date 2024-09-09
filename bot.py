@@ -22,6 +22,15 @@ configuration.username = MUX_TOKEN_ID
 configuration.password = MUX_TOKEN_SECRET
 mux_client = mux_python.ApiClient(configuration)
 assets_api = mux_python.AssetsApi(mux_client)
+#
+# "plus" video quality is required for mp4 support
+#    https://docs.mux.com/guides/use-video-quality-levels
+#
+# "basic" video quality is free, but does not have mp4 support (currently, that might change after I write this)
+#
+# Best to be explicit with video_quality because the default video_quality setting can be configured at the organization-level.
+#
+video_quality = "plus"
 
 @bot.event
 async def on_ready():
@@ -107,7 +116,8 @@ async def create_mux_asset(video_url, generate_mp4=False):
     create_asset_request = mux_python.CreateAssetRequest(
         input=input_settings,
         playback_policy=['public'],
-        mp4_support="capped-1080p" if generate_mp4 else None
+        mp4_support="capped-1080p" if generate_mp4 else None,
+        video_quality=video_quality
     )
     
     asset = assets_api.create_asset(create_asset_request)
